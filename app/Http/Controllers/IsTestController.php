@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\UsersExport;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
-use Maatwebsite\Excel\Facades\Excel;
 use ZanySoft\Zip\Zip;
+use Illuminate\Support\Facades\Cache;
 
 class IsTestController extends Controller
 {
@@ -17,20 +16,31 @@ class IsTestController extends Controller
 
     public function step3()
     {
-        $users = User::query()
-            ->leftJoin('user_attributes as ua', 'ua.user_id', '=', 'users.id')
-            ->where('users.name', 'like', 'Dr.%')
-            ->where('ua.attributes', 'regexp', '\"mobile\"\:\"\+1[0-9-]+"')
-            ->orderByRaw('substr(ua.attributes, 5, 10) desc');
 
+        $users = $this->userQuery();
         $sql = $users->toSql();
-
         $begin = microtime(true);
-        $users->get();
+        // The cache will be cleared every time a user is created.
+        // You can use User::created() event to clear the cache when a new user is created.
+       Cache::remember('user_join_key_{{$user_auth_id}}',env('CACHE_EXPIRE_TIME'),function () use ($users) {
+         return $users->get();
+        });
         $duration = microtime(true) - $begin;
-
         return view('step3', compact('duration', 'sql'));
     }
+
+    public function userQuery()
+    {
+
+              return  User::query()
+                ->leftJoin('user_attributes as ua', 'ua.user_id', '=', 'users.id')
+                ->select(['users.name', 'ua.attributes', 'email'])
+                ->where('users.name', 'like', 'Dr.%')
+                ->whereRaw("JSON_UNQUOTE(JSON_EXTRACT(ua.attributes, '$.mobile')) REGEXP '\\\\+1[0-9-]+'")
+                ->orderByRaw('SUBSTRING(JSON_UNQUOTE(JSON_EXTRACT(ua.attributes, \'$.mobile\')), 5, 10) DESC');
+
+    }
+
 
     public function result()
     {
