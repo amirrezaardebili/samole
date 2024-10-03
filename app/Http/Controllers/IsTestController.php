@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\UsersExport;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
+use Maatwebsite\Excel\Facades\Excel;
 use ZanySoft\Zip\Zip;
 
 class IsTestController extends Controller
 {
     public function export()
     {
-        return "Export all user in here";
+        return Excel::download(new UsersExport, 'users.xlsx');
     }
 
     public function step3()
