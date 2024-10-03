@@ -43,6 +43,6 @@ class User extends Authenticatable
 
     public function attributes()
     {
-        return $this->hasOne(User_Attributes::class);
+        return $this->hasOne(User_Attributes::class,'user_id','id');
     }
 }
