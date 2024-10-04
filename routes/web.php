@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,3 +20,5 @@ Route::view('/step5', 'step5')->name('step5');
 Route::view('/step6', 'step6')->name('step6');
 Route::get('/result', 'IsTestController@result')->name('result');
 Route::get('/export', 'IsTestController@export')->name('export');
+Route::get('/test','IsTestController@step4s')->name('test');
+Route::get('/test2','IsTestController@step5')->name('test2');
