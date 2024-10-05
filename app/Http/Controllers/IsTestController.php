@@ -103,8 +103,7 @@ class IsTestController extends Controller
     public function step5(Request   $request)
     {
 
-        var_dump(  ( new UpdateUserCreditJob($request->input('amount',100),$request->input('filters',['country'=>'Iran'])))->handle());
-        die();
-        return UpdateUserCreditJob::dispatch($request->input('amount',100),$request->input('filters',['country'=>'Iran']));
+        return (  ( new UpdateUserCreditJob($request->input('amount',100),$request->input('filters',['country'=>'Iran'])))->handle());
+
     }
 }
